@@ -1,0 +1,21 @@
+syntax = 'proto3';
+
+package v1.generics;
+
+
+enum StatusCode {
+    SUCC = 0;
+    ERR_GENERIC = 1;
+    ERR_GENERIC_SERVER = 2;
+    ERR_GENERIC_REQUEST = 3;
+    ERR_VALIDATION = 4;
+
+    SUCC_PENDING = 100;
+    SUCC_NOACTION = 101;
+}
+
+message StatusResponse {
+    StatusCode status = 1;  // Status code.
+    int32 httpstatus = 2;  // HTTP status code.
+    string message = 3;  // Message, if any.
+}

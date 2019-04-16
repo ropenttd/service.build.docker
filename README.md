@@ -1,13 +1,12 @@
-# Renai
+# Tsubasa, The /r/openttd Infrastructure
 
-## A /r/openttd build chain tool
+**Tsubasa** is all of /r/openttd's custom infrastructure in one handy monorepository.
 
-<sup><sup><sup><sup>_se no-_</sup></sup></sup></sup>
+It is built using the microservices model, which means individual components can be modified / screwed with without bring the rest of the service down.
 
-**Renai** is a build tool which does the following:
+Mostly written in Go / Docker, though some _Make_ magic happens occasionally. 
+Other languages are perfectly acceptable.
 
-* Listens for a HTTP REST command, with a target build version
-* Builds that target version using the local Docker host (and the Dockerfile contained in our docker_openttd repository)
-* Pushes it to the Docker Hub
-
-This builder is designed to be nudged by a HTTP client.
+Intraservice communication and management happens using the following:
+* _Protobuf / GRPC_ - RPC between services.
+* _Kubernetes_ - Service discovery, deployment, etcetera.

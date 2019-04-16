@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
+	"github.com/ropenttd/tsubasa/generics/pkg/helpers"
 	"log"
 	"strings"
 
@@ -18,18 +19,24 @@ func Build(ctx context.Context, buildClient *dockerConfig, buildConfig *dockerBu
 		targetTags = append(targetTags, buildConfig.repoName+":"+tag)
 	}
 
+	// Get a new buildClient for this build.
+	bc, err := buildClient.getClient()
+	if err != nil {
+		return err
+	}
+
 	// Prepare the build options.
 	buildOptions := types.ImageBuildOptions{
 		Dockerfile:    "Dockerfile",
 		RemoteContext: buildConfig.buildSource,
 		Tags:          targetTags,
 		// NoCache: true,
-		BuildArgs: buildConfig.buildArgs,
+		BuildArgs: *helpers.MarshalStringStringMapToPoint(&buildConfig.buildArgs),
 	}
 
 	// Issue the build.
 	log.Printf("👷 Dispatching build %s:%s", buildConfig.repoName, buildConfig.repoVersion)
-	state, err := buildClient.client.ImageBuild(ctx, strings.NewReader(""), buildOptions)
+	state, err := bc.ImageBuild(ctx, strings.NewReader(""), buildOptions)
 
 	// Buffer the output to a scanner.
 	scanner := bufio.NewScanner(state.Body)
@@ -57,15 +64,34 @@ func Push(ctx context.Context, buildClient *dockerConfig, buildConfig *dockerBui
 		return errors.New("build has not or did not complete successfully, cannot push")
 	}
 
-	opt := types.ImagePushOptions{
-		All:          true,
-		RegistryAuth: buildClient.auth, // RegistryAuth is the base64 encoded credentials for the registry
-		// PrivilegeFunc is not defined because we have exhausted our authentication options
-		Platform: buildClient.platform,
+	AuthString, err := buildClient.authBase64()
+
+	if err != nil {
+		return err
 	}
-	var err error
+
+	// Get a new buildClient for this build.
+	bc, err := buildClient.getClient()
+	if err != nil {
+		return err
+	}
+
+	// Build the image push options.
+	opt := types.ImagePushOptions{
+		All:           true,
+		RegistryAuth:  AuthString,                // RegistryAuth is the base64 encoded credentials for the registry
+		PrivilegeFunc: buildClient.privilegeFunc, // Reserved for future use
+		Platform:      buildClient.platform,
+	}
+
+	// This is done synchronously instead of async because the first push will contain all of our layers
+	// subsequent pushes (which are just retags) will just reuse the layers already uploaded
 	for _, tag := range buildConfig.tags {
-		state, err := buildClient.client.ImagePush(ctx, buildConfig.repoName+":"+tag, opt)
+		state, err := bc.ImagePush(ctx, buildConfig.repoName+":"+tag, opt)
+		if err != nil {
+			log.Printf("⚠️ Failed to push image: %s", err)
+			return err
+		}
 		// Buffer the output to a scanner.
 		defer state.Close()
 		scanner := bufio.NewScanner(state)
