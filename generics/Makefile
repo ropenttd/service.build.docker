@@ -23,6 +23,3 @@ run:
 	./$(BINARY_NAME)
 deps:
 	$(GODEP)
-protobuf:
-	cd api/protobuf && \
-	PATH=${PATH}:${GOPATH}/bin protoc --proto_path=${GOPATH}/src --proto_path=${GOPATH}/src/github.com/google/protobuf/src --proto_path=. --go_out=. --govalidators_out=. *.proto

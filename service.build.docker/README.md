@@ -1,5 +1,7 @@
 # service.build.docker
 
+**NOTE: NOT YET UPDATED TO NEW REST FORMAT, STILL USING GRPC**
+
 This service is a builder that builds the requested images and pushes them to the requested repository.
 
 ## Optimizations that could be made

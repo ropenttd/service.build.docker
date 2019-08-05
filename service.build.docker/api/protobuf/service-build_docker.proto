@@ -2,8 +2,6 @@ syntax = 'proto3';
 
 package v1;
 
-// We use validators because they're fucking cool.
-import "github.com/mwitkow/go-proto-validators/validator.proto";
 import "github.com/ropenttd/tsubasa/generics/api/protobuf/generic-signalling.proto";
 
 
@@ -11,12 +9,12 @@ import "github.com/ropenttd/tsubasa/generics/api/protobuf/generic-signalling.pro
 // BuildRequests return StatusResponse.
 message BuildRequest {
 	message BuildRequestSourceData {
-		string repo = 1 [(validator.field) = {msg_exists : true}];  // The location of the Dockerfile to build (i.e a Git repository)
+		string repo = 1;  // The location of the Dockerfile to build (i.e a Git repository)
 		map<string, string> build_args = 2;  // Arguments to pass to the build environment.
 	}
 	message BuildRequestTargetData {
-		string repo_name = 1 [(validator.field) = {msg_exists : true}];  // The name of the Registry image to upload to.
-		string image_version = 2 [(validator.field) = {msg_exists : true}];  // The version that this package should be tagged with.
+		string repo_name = 1;  // The name of the Registry image to upload to.
+		string image_version = 2;  // The version that this package should be tagged with.
 		repeated string tag = 3;  // Any extra tags that should be applied to this build.
 	}
     BuildRequestSourceData source = 1;

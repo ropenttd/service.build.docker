@@ -11,7 +11,7 @@ BINARY_UNIX=$(BINARY_NAME)_unix
 
 all: test build
 build:
-	$(GOBUILD) -o $(BINARY_NAME) -v cmd/service_build_docker/main.go
+	$(GOBUILD) -o $(BINARY_NAME) -v cmd/service_openttd_gameserver/main.go
 test:
 	$(GOTEST) -v ./...
 clean:

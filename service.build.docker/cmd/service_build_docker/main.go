@@ -13,10 +13,17 @@ func main() {
 	configAuthUser := environment.GetEnv("DOCKER_AUTH_USER", "")
 	configAuthPass := environment.GetEnv("DOCKER_AUTH_PASS", "")
 	configPortS := environment.GetEnv("SERVICE-BUILD-DOCKER_PORT", "80")
+	configDebugS := environment.GetEnv("SERVICE-BUILD-DOCKER_DEBUG", "false")
 
 	configPort, err := strconv.Atoi(configPortS)
 	if err != nil {
 		log.Fatalf("Port %s is not an integer", configPortS)
 	}
-	handler.RunServer(configHostname, configAuthUser, configAuthPass, configPort)
+
+	configDebug, err := strconv.ParseBool(configDebugS)
+	if err != nil {
+		log.Fatalf("Debug envvar %s is not parsable as a boolean", configDebugS)
+	}
+
+	handler.RunServer(configHostname, configAuthUser, configAuthPass, configPort, configDebug)
 }

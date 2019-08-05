@@ -5,11 +5,12 @@ import (
 	"github.com/ropenttd/tsubasa/service.build.docker/api/protobuf"
 	"github.com/ropenttd/tsubasa/service.build.docker/pkg/builder"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 )
 
-func RunServer(configHostname string, configAuthUser string, configAuthPass string, configPort int) {
+func RunServer(configHostname string, configAuthUser string, configAuthPass string, configPort int, debug bool) {
 	// Initialize the Docker config.
 	var err error
 	builder.BuildClientConfig, err = builder.CreatedockerConfig(configHostname, configAuthUser, configAuthPass)
@@ -23,7 +24,11 @@ func RunServer(configHostname string, configAuthUser string, configAuthPass stri
 	}
 	grpcServer := grpc.NewServer()
 	v1.RegisterDockerBuildServer(grpcServer, &BuildDockerHandler{})
-	// ... // determine whether to use TLS
+
+	// TODO determine whether to use TLS
+
+	// Add the gRPC reflector
+	reflection.Register(grpcServer)
 
 	// Serve
 	log.Printf("🚀️ service.build.docker - ready to serve GRPC")

@@ -12,3 +12,4 @@ BINARY_UNIX=$(BINARY_NAME)_unix
 protobuf:
 	$(MAKE) -C generics protobuf
 	$(MAKE) -C service.build.docker protobuf
+	$(MAKE) -C service.versionwatch protobuf
