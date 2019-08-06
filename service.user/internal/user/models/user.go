@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
-	u "github.com/ropenttd/tsubasa/service.openttd.gameserver/pkg/utils"
+	resp "github.com/ropenttd/tsubasa/generics/pkg/responses"
 	"github.com/satori/go.uuid"
 	"strings"
 	"time"
@@ -24,11 +24,11 @@ returns message and true if the requirement is met
 */
 func (user *User) Validate() (map[string]interface{}, bool) {
 	if user.Username == "" {
-		return u.Message(false, "Username is required"), false
+		return resp.Message(false, "Username is required"), false
 	}
 
 	if !strings.Contains(user.Email, "@") {
-		return u.Message(false, "Email address is required"), false
+		return resp.Message(false, "Email address is required"), false
 	}
 
 	//Email must be unique
@@ -37,18 +37,18 @@ func (user *User) Validate() (map[string]interface{}, bool) {
 	//check for errors and duplicates
 	err := GetDB().Table("users").Where("email = ? OR username = ?", user.Email, user.Username).First(t).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return u.Message(false, "Connection error. Please retry"), false
+		return resp.Message(false, "Connection error. Please retry"), false
 	}
 	if t.Email == user.Email {
-		return u.Message(false, "Email address already in use by another user."), false
+		return resp.Message(false, "Email address already in use by another user."), false
 	} else if t.Username == user.Username {
-		return u.Message(false, "Username already in use."), false
+		return resp.Message(false, "Username already in use."), false
 	} else {
-		return u.Message(false, "This user is already taken."), false
+		return resp.Message(false, "This user is already taken."), false
 	}
 
 	//All the required parameters are present
-	return u.Message(true, "success"), true
+	return resp.Message(true, "success"), true
 }
 
 func (user *User) Create() map[string]interface{} {
@@ -58,7 +58,7 @@ func (user *User) Create() map[string]interface{} {
 
 	GetDB().Create(user)
 
-	resp := u.Message(true, "success")
+	resp := resp.Message(true, "success")
 	resp["user"] = user
 	return resp
 }

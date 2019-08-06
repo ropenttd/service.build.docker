@@ -3,12 +3,11 @@ package versionwatch
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/ropenttd/tsubasa/generics/pkg/serviceserve"
 	"github.com/ropenttd/tsubasa/service.openttd.gameserver/internal/gameserver/controllers"
-	"log"
-	"net/http"
 )
 
-func RunServer(configPort *int) {
+func RunServer() {
 
 	router := mux.NewRouter()
 
@@ -22,8 +21,7 @@ func RunServer(configPort *int) {
 	//router.HandleFunc("/api/gameserver/{id}/state", controllers.PutGameserverState).Methods("PUT")
 	//router.HandleFunc("/api/gameserver/{id}/state", controllers.PatchGameserverState).Methods("PATCH")
 
-	log.Printf("🚀️ service.openttd.gameserver - ready to serve")
-	err := http.ListenAndServe(fmt.Sprintf(":%v", *configPort), router)
+	err := serviceserve.Serve(router)
 	if err != nil {
 		fmt.Print(err)
 	}

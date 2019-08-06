@@ -3,8 +3,8 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/ropenttd/tsubasa/service.openttd.gameserver/internal/gameserver/models"
-	u "github.com/ropenttd/tsubasa/service.openttd.gameserver/pkg/utils"
+	resp "github.com/ropenttd/tsubasa/generics/pkg/responses"
+	"github.com/ropenttd/tsubasa/service.user/internal/user/models"
 	"github.com/satori/go.uuid"
 	"net/http"
 )
@@ -14,34 +14,34 @@ var CreateGameserver = func(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(gameserver)
 	if err != nil {
-		u.Respond(w, u.Message(false, "Error while decoding request body"))
+		resp.Respond(w, resp.Message(false, "Error while decoding request body"))
 		return
 	}
 
-	resp := gameserver.Create()
-	u.Respond(w, resp)
+	response := gameserver.Create()
+	resp.Respond(w, response)
 }
 
 var GetGameserverByID = func(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.FromString(mux.Vars(r)["id"])
 
 	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid UUID supplied"))
+		resp.Respond(w, resp.Message(false, "Invalid UUID supplied"))
 	}
 
 	data := models.GetGameserverByID(id)
-	resp := u.Message(true, "success")
-	resp["data"] = data
-	u.Respond(w, resp)
+	response := resp.Message(true, "success")
+	response["data"] = data
+	resp.Respond(w, response)
 }
 
 var GetGameserverByShortname = func(w http.ResponseWriter, r *http.Request) {
 	sn := mux.Vars(r)["shortname"]
 
 	data := models.GetGameserverByShortname(&sn)
-	resp := u.Message(true, "success")
-	resp["data"] = data
-	u.Respond(w, resp)
+	response := resp.Message(true, "success")
+	response["data"] = data
+	resp.Respond(w, response)
 }
 
 /*var SearchGameserver = func(w http.ResponseWriter, r *http.Request) {
@@ -49,12 +49,12 @@ var GetGameserverByShortname = func(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(gameserver) //decode the request body into struct and failed if any error occur
 	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request"))
+		resp.Respond(w, resp.Message(false, "Invalid request"))
 		return
 	}
 
 	data := models.SearchGameserver(gameserver)
-	resp := u.Message(true, "success")
-	resp["data"] = data
-	u.Respond(w, resp)
+	response := resp.Message(true, "success")
+	response["data"] = data
+	resp.Respond(w, response)
 }*/

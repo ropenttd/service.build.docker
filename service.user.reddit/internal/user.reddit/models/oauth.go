@@ -1,7 +1,7 @@
 package models
 
 import (
-	u "github.com/ropenttd/tsubasa/service.openttd.gameserver/pkg/utils"
+	r "github.com/ropenttd/tsubasa/generics/pkg/responses"
 	"github.com/ropenttd/tsubasa/service.user.reddit/internal/user.reddit/app"
 	"github.com/satori/go.uuid"
 	"golang.org/x/oauth2"
@@ -25,15 +25,15 @@ returns message and true if the requirement is met
 */
 func (RedditOauthToken *RedditorOauthToken) Validate() (map[string]interface{}, bool) {
 	if RedditOauthToken.RedditorID == uuid.Nil {
-		return u.Message(false, "Redditor must be supplied"), false
+		return r.Message(false, "Redditor must be supplied"), false
 	}
 
 	if RedditOauthToken.AccessToken == "" {
-		return u.Message(false, "Access token was not supplied"), false
+		return r.Message(false, "Access token was not supplied"), false
 	}
 
 	//All the required parameters are present
-	return u.Message(true, "success"), true
+	return r.Message(true, "success"), true
 }
 
 func (RedditorIn *Redditor) StoreTokenForRedditor(token *oauth2.Token) map[string]interface{} {
@@ -45,7 +45,7 @@ func (RedditorIn *Redditor) StoreTokenForRedditor(token *oauth2.Token) map[strin
 	result.Token = *token
 	GetDB().Save(&result)
 
-	resp := u.Message(true, "success")
+	resp := r.Message(true, "success")
 	resp["redditor"] = result
 	return resp
 }

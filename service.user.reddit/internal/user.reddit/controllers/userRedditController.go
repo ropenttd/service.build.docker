@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	u "github.com/ropenttd/tsubasa/service.openttd.gameserver/pkg/utils"
+	resp "github.com/ropenttd/tsubasa/generics/pkg/responses"
 	"github.com/ropenttd/tsubasa/service.user.reddit/internal/user.reddit/app"
 	"github.com/ropenttd/tsubasa/service.user.reddit/internal/user.reddit/models"
 	"net/http"
@@ -11,32 +11,32 @@ import (
 var SendRedirect = func(w http.ResponseWriter, r *http.Request) {
 	url, err := app.GetRedditOAuthURL()
 	if err != nil {
-		u.Respond(w, u.Message(false, fmt.Sprint(err)))
+		resp.Respond(w, resp.Message(false, fmt.Sprint(err)))
 	}
-	u.RedirectFound(w, r, *url)
+	resp.RedirectFound(w, r, *url)
 }
 
 var ReceiveCallback = func(w http.ResponseWriter, r *http.Request) {
 	// Temporary, this should be randomly set / checked.
 	if r.URL.Query().Get("state") != "state" {
-		u.Respond(w, u.Message(false, "State mismatch (possible CSRF attack, or your session expired)"))
+		resp.Respond(w, resp.Message(false, "State mismatch (possible CSRF attack, or your session expired)"))
 		return
 	}
 
 	session, err := app.NewRedditOAuthSession()
 	if err != nil {
-		u.Respond(w, u.Message(false, fmt.Sprint(err)))
+		resp.Respond(w, resp.Message(false, fmt.Sprint(err)))
 		return
 	}
 	token, err := session.CodeAuthWithToken(r.URL.Query().Get("code"))
 	if err != nil {
-		u.Respond(w, u.Message(false, fmt.Sprint(err)))
+		resp.Respond(w, resp.Message(false, fmt.Sprint(err)))
 		return
 	}
 
 	currentRedditUser, err := session.Me()
 	if err != nil {
-		u.Respond(w, u.Message(false, fmt.Sprint(err)))
+		resp.Respond(w, resp.Message(false, fmt.Sprint(err)))
 		return
 	}
 
@@ -64,6 +64,6 @@ var ReceiveCallback = func(w http.ResponseWriter, r *http.Request) {
 	// TODO from service.user GET "/api/user/{serviceUser.ID}/token"
 	//
 
-	resp := u.Message(true, "success")
-	u.Respond(w, resp)
+	response := resp.Message(true, "success")
+	resp.Respond(w, response)
 }

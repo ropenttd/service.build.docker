@@ -1,7 +1,7 @@
 package models
 
 import (
-	u "github.com/ropenttd/tsubasa/service.openttd.gameserver/pkg/utils"
+	r "github.com/ropenttd/tsubasa/generics/pkg/responses"
 	"github.com/ropenttd/tsubasa/service.user.reddit/internal/user.reddit/app"
 	"github.com/satori/go.uuid"
 	"time"
@@ -26,14 +26,14 @@ returns message and true if the requirement is met
 */
 func (redditor *Redditor) Validate() (map[string]interface{}, bool) {
 	if redditor.RedditID == "" {
-		return u.Message(false, "Reddit ID is required"), false
+		return r.Message(false, "Reddit ID is required"), false
 	}
 	if redditor.RedditUsername == "" {
-		return u.Message(false, "Reddit Username is required"), false
+		return r.Message(false, "Reddit Username is required"), false
 	}
 
 	//All the required parameters are present
-	return u.Message(true, "success"), true
+	return r.Message(true, "success"), true
 }
 
 func (RedditorIn *Redditor) Create() map[string]interface{} {
@@ -41,8 +41,8 @@ func (RedditorIn *Redditor) Create() map[string]interface{} {
 		return resp
 	}
 
-	GetDB().Where(Redditor{RedditID: RedditorIn.RedditID}).FirstOrCreate(&RedditorIn, RedditorIn)
-	resp := u.Message(true, "success")
+	GetDB().Preload("RedditToken").Where(Redditor{RedditID: RedditorIn.RedditID}).FirstOrCreate(&RedditorIn, RedditorIn)
+	resp := r.Message(true, "success")
 	resp["redditor"] = RedditorIn
 	return resp
 }
