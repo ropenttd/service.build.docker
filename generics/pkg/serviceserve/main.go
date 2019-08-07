@@ -70,7 +70,7 @@ func Serve(router *mux.Router) error {
 
 	go func() {
 		<-quit
-		Logger.Println("Server is shutting down...")
+		Logger.Println("😴 Server is shutting down...")
 		atomic.StoreInt32(&Healthy, 0)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -78,7 +78,7 @@ func Serve(router *mux.Router) error {
 
 		server.SetKeepAlivesEnabled(false)
 		if err := server.Shutdown(ctx); err != nil {
-			Logger.Fatalf("Could not gracefully shutdown the server: %v\n", err)
+			Logger.Fatalf("💥 Could not gracefully shutdown the server: %v\n", err)
 		}
 		close(done)
 	}()
@@ -86,12 +86,12 @@ func Serve(router *mux.Router) error {
 	Logger.Println("🚀 Ready for requests on", listenAddr)
 	atomic.StoreInt32(&Healthy, 1)
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		Logger.Fatalf("Could not listen on %s: %v\n", listenAddr, err)
+		Logger.Fatalf("💥 Could not listen on %s: %v\n", listenAddr, err)
 		return err
 	}
 
 	<-done
-	Logger.Println("Server stopped")
+	Logger.Println("🛌 Server stopped")
 	return nil
 }
 
