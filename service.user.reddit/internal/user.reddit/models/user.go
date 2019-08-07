@@ -17,7 +17,7 @@ type Redditor struct {
 
 	CreatedAt time.Time  `json:"created" gorm:"not null"`
 	UpdatedAt time.Time  `json:"updated" gorm:"not null"`
-	DeletedAt *time.Time `json:"deleted"`
+	DeletedAt *time.Time `json:"deleted,omitempty"`
 }
 
 /*

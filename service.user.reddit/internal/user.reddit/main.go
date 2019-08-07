@@ -8,7 +8,6 @@ import (
 )
 
 func RunServer() {
-
 	router := mux.NewRouter()
 
 	router.HandleFunc("/api/user/reddit/auth", controllers.SendRedirect).Methods("GET")
